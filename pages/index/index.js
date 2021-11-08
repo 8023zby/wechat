@@ -544,11 +544,57 @@ Page({
   },
 
   /**
+   * 获取个人信息
+   */
+  getUserProfile() {
+    console.log('????')
+    wx.showModal({
+      title: '温馨提示',
+      content: '亲，授权微信登录后才能正常使用小程序功能',
+      success(res) {
+        console.log(0)
+        console.log(res)
+        //如果用户点击了确定按钮
+        if (res.confirm) {
+          wx.getUserProfile({
+            desc: '获取你的昵称、头像、地区及性别',
+            success: res => {
+              console.log(res);
+              console.log(1);
+            },
+            fail: res => {
+              console.log(2);
+              console.log(res)
+              //拒绝授权
+              wx.showToast({
+                title: '您拒绝了请求,不能正常使用小程序',
+                icon: 'error',
+                duration: 2000
+              });
+              return;
+            }
+          });
+        } else if (res.cancel) {
+          //如果用户点击了取消按钮
+          console.log(3);
+          wx.showToast({
+            title: '您拒绝了请求,不能正常使用小程序',
+            icon: 'error',
+            duration: 2000
+          });
+          return;
+        }
+      }
+    });
+  },
+  
+  /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
+  onLoad (options) {
     // 确保页面数据已经刷新完毕~
     setTimeout(() => {
+      this.getUserProfile()
       this.getAllRects()
     }, 20)
   },
@@ -624,7 +670,7 @@ Page({
     // 获取商品数组的位置信息
     wx.createSelectorQuery().selectAll('.pro-item').boundingClientRect(function (rects) {
       rects.forEach(function (rect) {
-        console.log(rect)
+        // console.log(rect)
         // 这里减去44是根据你的滚动区域距离头部的高度，如果没有高度，可以将其删去
         proListToTop.push(rect.top - 44)
       })
@@ -634,7 +680,7 @@ Page({
     wx.createSelectorQuery().selectAll('.menu-item').boundingClientRect(function (rects) {
       wx.getSystemInfo({
         success: function (res) {
-          console.log(res);
+          // console.log(res);
           windowHeight = res.windowHeight / 2
           // console.log(windowHeight)
           rects.forEach(function (rect) {
